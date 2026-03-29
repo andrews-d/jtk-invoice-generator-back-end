@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import http from "http";
 
 import authRoutes from "./routes/authRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
@@ -49,8 +50,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 8000;
+const server = http.createServer(app);
 
-app.listen(PORT, () => {
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 120000;
+
+const PORT = process.env.PORT || 10000;
+
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on port ${PORT}`);
+// });
