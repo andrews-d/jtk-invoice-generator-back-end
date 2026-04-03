@@ -33,7 +33,7 @@ const invoiceSchema = new mongoose.Schema(
 
     received: { type: Number, default: 0 },
     totalAmount: Number,
-    balanceAmount: Number,
+    balance: Number,
 
     isActive: { type: Boolean, default: true },
 
