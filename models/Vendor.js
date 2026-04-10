@@ -21,6 +21,9 @@ const vendorSchema = new mongoose.Schema(
     address3: {
       type: String,
     },
+    pinCode: {
+      type: Number,
+    },
     isActive: { type: Boolean, default: true },
   },
   {
