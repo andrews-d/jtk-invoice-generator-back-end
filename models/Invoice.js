@@ -17,7 +17,8 @@ const invoiceSchema = new mongoose.Schema(
     vehicleNumber: String,
     containerNo: String,
     placeOfSupply: String,
-    bookingDetails: String,
+    fromPlace: String,
+    toPlace: String,
 
     vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "Vendor" },
 

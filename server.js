@@ -1,55 +1,80 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/db.js";
 import http from "http";
 
+import connectDB from "./config/db.js";
+
+/* Routes */
 import authRoutes from "./routes/authRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
+
+/* Error system */
+import { errorHandler } from "./middleware/errorHandler.js";
+import { ERROR_CODES } from "./constants/errorCodes.js";
 
 dotenv.config();
 
 const app = express();
 
-/* ✅ Connect DB FIRST */
+/* =========================
+   ✅ DB CONNECT
+========================= */
 connectDB();
 
-/* ✅ Body parser */
+/* =========================
+   ✅ MIDDLEWARE
+========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ✅ CORS (works for local + future deploy) */
 app.use(
   cors({
-    origin: true, // 🔥 allow any origin for now
+    origin: true, // allow all origins (dev mode)
     credentials: true,
   }),
 );
 
-/* ✅ Health check */
+/* =========================
+   ✅ HEALTH CHECK
+========================= */
 app.get("/", (req, res) => {
-  res.send("API Running 🚀");
+  res.status(200).json({
+    success: true,
+    message: "API Running 🚀",
+  });
 });
 
-/* ✅ Routes */
+/* =========================
+   ✅ ROUTES
+========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/invoices", invoiceRoutes);
 
-/* ✅ 404 handler */
+/* =========================
+   ❌ 404 HANDLER
+========================= */
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
-/* ✅ Global Error handler */
-app.use((err, req, res, next) => {
-  console.error("❌ ERROR:", err.message);
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
+  res.status(404).json({
+    success: false,
+    error: {
+      code: ERROR_CODES.NOT_FOUND,
+      message: "Route not found",
+    },
   });
 });
 
+/* =========================
+   🔥 GLOBAL ERROR HANDLER
+   MUST BE LAST
+========================= */
+app.use(errorHandler);
+
+/* =========================
+   🚀 SERVER
+========================= */
 const server = http.createServer(app);
 
 server.keepAliveTimeout = 120000;
@@ -60,6 +85,3 @@ const PORT = process.env.PORT || 10000;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-// app.listen(PORT, () => {
-//   console.log(`🚀 Server running on port ${PORT}`);
-// });
